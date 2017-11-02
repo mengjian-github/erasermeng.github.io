@@ -9,7 +9,7 @@
   <title>按需加载polyfill——babel7的正确打开方式 | 孟健的个人博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="babel7已经进入Beta 4阶段，对我而言，babel使用最大的诟病应该在于它过大的polyfill，尤其是在移动端还是会影响一些性能，今天试用了下最新版的babel-preset-env，发现它的useBuiltIns配置项添加了新的特性，支持真正的按需加载polyfill，剔除代码中没有用到的，简直不能太赞~  测试关于ES6/7的转义情况源代码如下：1234var a = new Ma">
-<meta name="keywords" content="前端开发,Webpack,Vue,Angular,React,Node.js,前端工程化,JavaScript,Gulp,CSS3,Vuex,Redux,Mobx,Express,Koa,HTML5">
+<meta name="keywords" content="babel7,polyfill,babel,babel-preset-env">
 <meta property="og:type" content="article">
 <meta property="og:title" content="按需加载polyfill——babel7的正确打开方式">
 <meta property="og:url" content="https://erasermeng.github.io/2017/11/02/按需加载polyfill——babel7的正确打开方式/index.html">
@@ -18,7 +18,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://erasermeng.github.io/2017/11/02/按需加载polyfill——babel7的正确打开方式/1.png">
 <meta property="og:image" content="https://erasermeng.github.io/2017/11/02/按需加载polyfill——babel7的正确打开方式/2.png">
-<meta property="og:updated_time" content="2017-11-02T14:15:15.000Z">
+<meta property="og:updated_time" content="2017-11-02T14:18:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="按需加载polyfill——babel7的正确打开方式">
 <meta name="twitter:description" content="babel7已经进入Beta 4阶段，对我而言，babel使用最大的诟病应该在于它过大的polyfill，尤其是在移动端还是会影响一些性能，今天试用了下最新版的babel-preset-env，发现它的useBuiltIns配置项添加了新的特性，支持真正的按需加载polyfill，剔除代码中没有用到的，简直不能太赞~  测试关于ES6/7的转义情况源代码如下：1234var a = new Ma">
@@ -254,6 +254,29 @@
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">babel7</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">polyfill</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">babel</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">babel-preset-env</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -317,6 +340,15 @@
 
   
 <nav id="article-nav">
+  
+    <a href="/2017/11/02/高效编程——从代码规范做起/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          高效编程——从代码规范做起
+        
+      </div>
+    </a>
   
   
     <a href="/2017/10/23/你真的用好GIT吗/" id="article-nav-older" class="article-nav-link-wrap">
@@ -482,6 +514,14 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">博客</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
@@ -490,11 +530,35 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color2">babel7</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">博客</a>
+                <a href="javascript:void(0)" class="js-tag color4">polyfill</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">babel</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">babel-preset-env</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">代码规范</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">代码风格</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">编程模式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">ES2015</a>
               </li>
              
               <li class="article-tag-list-item">

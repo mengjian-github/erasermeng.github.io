@@ -158,6 +158,202 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-按需加载polyfill——babel7的正确打开方式" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/02/按需加载polyfill——babel7的正确打开方式/">按需加载polyfill——babel7的正确打开方式</a>
+    </h1>
+  
+
+        
+        <a href="/2017/11/02/按需加载polyfill——babel7的正确打开方式/" class="archive-article-date">
+  	<time datetime="2017-11-02T14:11:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-11-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>babel7已经进入Beta 4阶段，对我而言，babel使用最大的诟病应该在于它过大的polyfill，尤其是在移动端还是会影响一些性能，今天试用了下最新版的babel-preset-env，发现它的useBuiltIns配置项添加了新的特性，支持真正的按需加载polyfill，剔除代码中没有用到的，简直不能太赞~</p>
+</blockquote>
+<h3 id="测试关于ES6-7的转义情况"><a href="#测试关于ES6-7的转义情况" class="headerlink" title="测试关于ES6/7的转义情况"></a>测试关于ES6/7的转义情况</h3><p>源代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var a = new Map();</div><div class="line">var b = Promise.resolve();</div><div class="line">Object.assign(&#123;&#125;, &#123;1: 1&#125;);</div><div class="line">&quot;foobar&quot;.includes(&quot;foo&quot;);</div></pre></td></tr></table></figure></p>
+<p>经<code>babel</code>转义后代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">import &quot;@babel/polyfill/lib/core-js/modules/es7.array.includes&quot;;</div><div class="line">import &quot;@babel/polyfill/lib/core-js/modules/es6.string.includes&quot;;</div><div class="line"></div><div class="line">var _Object$assign = require(&quot;@babel/runtime/core-js/object/assign&quot;);</div><div class="line"></div><div class="line">var _Promise = require(&quot;@babel/runtime/core-js/promise&quot;);</div><div class="line"></div><div class="line">var _Map = require(&quot;@babel/runtime/core-js/map&quot;);</div><div class="line"></div><div class="line">var a = new _Map();</div><div class="line"></div><div class="line">var b = _Promise.resolve();</div><div class="line"></div><div class="line">_Object$assign(&#123;&#125;, &#123;</div><div class="line">  1: 1</div><div class="line">&#125;);</div><div class="line"></div><div class="line">&quot;foobar&quot;.includes(&quot;foo&quot;);</div></pre></td></tr></table></figure></p>
+<p><strong>它真正做到了按需加载！</strong></p>
+<p> 再测试一下<code>Async/await</code>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">async function testAwait() &#123;</div><div class="line">  await new Promise();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>转义之后的结果略微复杂一些：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">import _regeneratorRuntime from &quot;@babel/runtime/regenerator&quot;;</div><div class="line">import _Promise from &quot;@babel/runtime/core-js/promise&quot;;</div><div class="line">import &quot;@babel/polyfill/lib/regenerator-runtime/runtime&quot;;</div><div class="line"></div><div class="line">var _asyncToGenerator = require(&quot;@babel/runtime/helpers/asyncToGenerator&quot;);</div><div class="line"></div><div class="line">var testAwait = function () &#123;</div><div class="line">  var _ref = _asyncToGenerator(</div><div class="line">  /*#__PURE__*/</div><div class="line">  _regeneratorRuntime.mark(function _callee() &#123;</div><div class="line">    return _regeneratorRuntime.wrap(function _callee$(_context) &#123;</div><div class="line">      while (1) &#123;</div><div class="line">        switch (_context.prev = _context.next) &#123;</div><div class="line">          case 0:</div><div class="line">            _context.next = 2;</div><div class="line">            return new _Promise();</div><div class="line"></div><div class="line">          case 2:</div><div class="line">          case &quot;end&quot;:</div><div class="line">            return _context.stop();</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;, _callee, this);</div><div class="line">  &#125;));</div><div class="line"></div><div class="line">  return function testAwait() &#123;</div><div class="line">    return _ref.apply(this, arguments);</div><div class="line">  &#125;;</div><div class="line">&#125;();</div></pre></td></tr></table></figure></p>
+<p>最终我们不再需要再引入一个大的<code>polyfill</code>文件了！</p>
+<h3 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h3><p>首先，将<code>babel</code>及其周边插件等都升级到<code>beta</code>版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&quot;@babel/cli&quot;: &quot;^7.0.0-beta.4&quot;,</div><div class="line">&quot;@babel/core&quot;: &quot;^7.0.0-beta.5&quot;,</div><div class="line">&quot;@babel/plugin-transform-runtime&quot;: &quot;^7.0.0-beta.4&quot;,</div><div class="line">&quot;@babel/preset-env&quot;: &quot;^7.0.0-beta.5&quot;,</div><div class="line">&quot;@babel/preset-stage-2&quot;: &quot;^7.0.0-beta.4&quot;,</div><div class="line">&quot;@babel/runtime&quot;: &quot;^7.0.0-beta.4&quot;,</div><div class="line">&quot;@babel/polyfill&quot;: &quot;^7.0.0-beta.4&quot;,</div><div class="line">&quot;babel-loader&quot;: &quot;^8.0.0-beta.0&quot;,</div><div class="line">&quot;babel-helper-regex&quot;: &quot;^6.26.0&quot;</div></pre></td></tr></table></figure>
+<p>配置正确的<code>.babelrc</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;presets&quot;: [</div><div class="line">    [&quot;@babel/env&quot;, &#123;</div><div class="line">      &quot;modules&quot;: false,</div><div class="line">      &quot;targets&quot;: &#123;</div><div class="line">        &quot;browsers&quot;: [&quot;&gt; 1%&quot;, &quot;last 2 versions&quot;, &quot;not ie &lt;= 8&quot;]</div><div class="line">      &#125;,</div><div class="line">      &quot;useBuiltIns&quot;: &quot;usage&quot; </div><div class="line">    &#125;],</div><div class="line">    &quot;@babel/stage-2&quot;</div><div class="line">  ],</div><div class="line">  &quot;plugins&quot;: [&quot;@babel/transform-runtime&quot;]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>关键点是<code>useBuiltIns</code>这一配置项，它的值有三种：</p>
+<ul>
+<li><code>false</code>:  不对<code>polyfills</code>做任何操作</li>
+<li><code>entry</code>: 根据<code>target</code>中浏览器版本的支持，将<code>polyfills</code>拆分引入，仅引入有浏览器不支持的<code>polyfill</code></li>
+<li><code>usage(新)</code>：检测代码中<code>ES6/7/8</code>等的使用情况，仅仅加载代码中用到的<code>polyfills</code></li>
+</ul>
+<h3 id="生产实践"><a href="#生产实践" class="headerlink" title="生产实践"></a>生产实践</h3><p>拿现有项目试用了下，在压缩的前提下，代码体积有着显著的减少（50KB左右）：</p>
+<p>使用前（压缩）：<br><img src="/2017/11/02/按需加载polyfill——babel7的正确打开方式/1.png" alt="1.png" title=""><br>使用后（压缩）：<br><img src="/2017/11/02/按需加载polyfill——babel7的正确打开方式/2.png" alt="2.png" title=""></p>
+<p>验证了下功能，完全正常！</p>
+<p>如果使用<code>useBuiltIns: &quot;entry&quot;</code>，会发现加载了无数个<code>polyfill</code>!!!:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div></pre></td><td class="code"><pre><div class="line">Replaced `@babel/polyfill` with the following polyfills:</div><div class="line">  es6.typed.array-buffer &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.int8-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.uint8-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.uint8-clamped-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.int16-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.uint16-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.int32-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.uint32-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.float32-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.typed.float64-array &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.map &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.set &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.weak-map &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.weak-set &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.apply &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.construct &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.define-property &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.delete-property &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.get &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.get-own-property-descriptor &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.get-prototype-of &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.has &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.is-extensible &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.own-keys &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.prevent-extensions &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.set &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.reflect.set-prototype-of &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.promise &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.symbol &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.freeze &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.seal &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.prevent-extensions &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.is-frozen &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.is-sealed &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.is-extensible &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.get-own-property-descriptor &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.get-prototype-of &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.keys &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.get-own-property-names &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.assign &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.is &#123; &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.object.set-prototype-of &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.function.name &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.string.raw &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.string.from-code-point &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.string.code-point-at &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.string.repeat &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.string.starts-with &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.string.ends-with &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.string.includes &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.regexp.flags &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.regexp.match &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.regexp.replace &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.regexp.split &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.regexp.search &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.array.from &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.array.of &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.array.copy-within &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.array.find &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.array.find-index &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.array.fill &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.array.iterator &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.is-finite &#123; &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.is-integer &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.is-safe-integer &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.is-nan &#123; &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.epsilon &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.min-safe-integer &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.max-safe-integer &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.parse-float &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.number.parse-int &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.acosh &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.asinh &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.atanh &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.cbrt &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.clz32 &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.cosh &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.expm1 &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.fround &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.hypot &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.imul &#123; &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.log1p &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.log10 &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.log2 &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.sign &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.sinh &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.tanh &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es6.math.trunc &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es7.array.includes &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es7.object.values &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot;, &quot;ios&quot;:&quot;10&quot; &#125;</div><div class="line">  es7.object.entries &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot;, &quot;ios&quot;:&quot;10&quot; &#125;</div><div class="line">  es7.object.get-own-property-descriptors &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot;, &quot;ios&quot;:&quot;10&quot; &#125;</div><div class="line">  es7.string.pad-start &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es7.string.pad-end &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  web.timers &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;firefox&quot;:&quot;55&quot;, &quot;ie&quot;:&quot;10&quot;, &quot;ios&quot;:&quot;10&quot;, &quot;safari&quot;:&quot;10.1&quot; &#125;</div><div class="line">  web.immediate &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;firefox&quot;:&quot;55&quot;, &quot;ie&quot;:&quot;10&quot;, &quot;ios&quot;:&quot;10&quot;, &quot;safari&quot;:&quot;10.1&quot; &#125;</div><div class="line">  web.dom.iterable &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;firefox&quot;:&quot;55&quot;, &quot;ie&quot;:&quot;10&quot;, &quot;ios&quot;:&quot;10&quot;, &quot;safari&quot;:&quot;10.1&quot; &#125;</div></pre></td></tr></table></figure></p>
+<p>换成<code>usage</code>模式后：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Added following polyfills:</div><div class="line">  es6.string.includes &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  es7.array.includes &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;ie&quot;:&quot;10&quot; &#125;</div><div class="line">  regenerator-runtime &#123; &quot;android&quot;:&quot;4.4.3&quot;, &quot;chrome&quot;:&quot;49&quot;, &quot;edge&quot;:&quot;15&quot;, &quot;firefox&quot;:&quot;55&quot;, &quot;ie&quot;:&quot;10&quot;, &quot;ios&quot;:&quot;10&quot;, &quot;safari&quot;:&quot;10.1&quot; &#125;</div></pre></td></tr></table></figure></p>
+<p><strong>仅仅加载了3个<code>polyfills</code>！！</strong></p>
+<h3 id="进一步思考"><a href="#进一步思考" class="headerlink" title="进一步思考"></a>进一步思考</h3><p>这到底是如何做到的呢？对于JS这种动态语言来说，只静态分析应该无法做到这一步，必须要加载执行后才可以，还需要经过大量测试，解析AST甚至是模拟引擎执行？在参考资料中的<code>Issue</code>中有着长达一年多的讨论，但还是不太了解最终的实现方式，如果有知道的大神还望不吝指教，万分感谢~</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a href="https://github.com/babel/babel/tree/master/experimental/babel-preset-env" target="_blank" rel="external">@babel/preset-env</a></li>
+<li><a href="https://github.com/babel/babel-preset-env/issues/443#issuecomment-336582996" target="_blank" rel="external">useBuiltins: “usage” appears not to work</a></li>
+<li><a href="https://github.com/babel/babel-preset-env/issues/284" target="_blank" rel="external">Discussion: useBuiltIns (usage only, not “entry” point method)</a></li>
+<li><a href="https://github.com/babel/babel-preset-env/issues/84" target="_blank" rel="external">useBuiltIns: figure out how to remove polyfills that aren’t actually used in the codebase</a></li>
+<li><a href="https://github.com/babel/babel-preset-env/issues/294" target="_blank" rel="external">Provide a way to determine which polyfills are required</a></li>
+<li><a href="https://github.com/babel/babel/issues/6491" target="_blank" rel="external">[7.0.0-beta.3] babel-preset-env useBuiltIns “usage” (possibly) adding unnecessary polyfills</a></li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/11/02/按需加载polyfill——babel7的正确打开方式/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-你真的用好GIT吗" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/23/你真的用好GIT吗/">你真的用好GIT吗</a>
+    </h1>
+  
+
+        
+        <a href="/2017/10/23/你真的用好GIT吗/" class="archive-article-date">
+  	<time datetime="2017-10-23T14:53:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>之前对于git的了解仅仅是在能用的程度上，没有去进一步使用思考（主要是没有使用场景），相信很多人也是一样。趁着这次新版活动开发迁移至git平台，撰写此文，也是对git的一个科普预热，之后在新版活动架构设计过程中，会不断输出此类总结文章，敬请期待~</p>
+</blockquote>
+<h2 id="你可能仅会的几个命令"><a href="#你可能仅会的几个命令" class="headerlink" title="你可能仅会的几个命令"></a>你可能仅会的几个命令</h2><ul>
+<li><code>git init/clone</code>建立一个空仓库/从现有仓库clone</li>
+<li><code>git config</code>设定用户名邮箱</li>
+<li><code>git add</code>将文件提交到暂存区</li>
+<li><code>git commit</code>文件提交至仓库</li>
+<li><code>git push/pull</code>提交远程仓库/更新本地仓库</li>
+<li><code>git status</code>查看git状态</li>
+<li><code>git branch</code>建立分支</li>
+<li><code>git checkout</code>切换分支</li>
+</ul>
+        
+          <a class="article-more-a" href="/2017/10/23/你真的用好GIT吗/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">工具</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">WebStorm</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">git</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">github</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/10/23/你真的用好GIT吗/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-WebStorm使用技巧整理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -785,19 +981,27 @@ getOwnMetadataKeys:function(t){return o(i(t),arguments.length<2?void 0:u(argumen
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">博客</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">技术总结</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">iframe</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">git</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">github</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">博客</a>
               </li>
              
               <li class="article-tag-list-item">

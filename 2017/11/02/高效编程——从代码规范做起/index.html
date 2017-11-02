@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="孟健的个人博客">
 <meta property="og:description" content="本文精心总结了适应新时代的代码规范，看起来虽然技术含量不高，经常被大家忽视，但却是我们能够实现高效编程的起点，也是能够体现专业素养的重要因素，遵循编码规范，养成一个良好的开发习惯对于日常开发至关重要。本文主要分为风格及业务里的编程规范两部分，以此奠定活动架构最基本的基石，高效编程还涉及到的设计模式、打包集成、架构思想等将在后续的文章中不断输出，敬请期待~  代码风格（ES.Next时代） JS代">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-02T14:17:51.000Z">
+<meta property="og:updated_time" content="2017-11-02T14:19:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="高效编程——从代码规范做起">
 <meta name="twitter:description" content="本文精心总结了适应新时代的代码规范，看起来虽然技术含量不高，经常被大家忽视，但却是我们能够实现高效编程的起点，也是能够体现专业素养的重要因素，遵循编码规范，养成一个良好的开发习惯对于日常开发至关重要。本文主要分为风格及业务里的编程规范两部分，以此奠定活动架构最基本的基石，高效编程还涉及到的设计模式、打包集成、架构思想等将在后续的文章中不断输出，敬请期待~  代码风格（ES.Next时代） JS代">
@@ -184,6 +184,7 @@
 <p>JS代码风格及规范有很多，但适合ES时代的规范却较少，本小节选取了一个备受大家欢迎的AirBnb的ES6规范介绍(github star数高达6万+，且在不断上涨)，在规范代码的同时也向团队推广下ES2015/6/7/…(简便起见，统称为ES.Next)，努力将代码写的更加简洁优雅，可维护。</p>
 <p>“程序是写给人读的，只是偶尔让计算机执行以下。”<br>——Donald Ervin Knuth（高德纳）</p>
 </blockquote>
+<a id="more"></a>
 <h3 id="1-使用const和let代替var"><a href="#1-使用const和let代替var" class="headerlink" title="1.  使用const和let代替var"></a>1.  使用<code>const</code>和<code>let</code>代替<code>var</code></h3><h4 id="描述："><a href="#描述：" class="headerlink" title="描述："></a>描述：</h4><p>声明变量或函数时，优先使用<code>const</code>，若之后有可能会改变，则使用<code>let</code>，永远不要使用<code>var</code>。</p>
 <h4 id="原因："><a href="#原因：" class="headerlink" title="原因："></a>原因：</h4><p>优先使用<code>const</code>，因为<code>const</code>表示该变量之后不会发生改变，提高代码可读性，替代<code>var</code>，因为<code>let</code>和<code>const</code>均具有块级作用域，而<code>var</code>会被提升至函数作用域！</p>
 <h4 id="ESLINT规则"><a href="#ESLINT规则" class="headerlink" title="ESLINT规则"></a>ESLINT规则</h4><p><code>prefer-const no-var</code></p>
